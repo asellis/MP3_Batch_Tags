@@ -1,4 +1,9 @@
-# Folder Handler to easily sort through contents and apply changes
+"""
+Folder Handler to easily sort through contents and apply changes
+Stores all files and information in a dictionary with the key being the original
+    file location
+"""
+
 from pathlib import Path
 import mp3_tag_functions as tag
 import time
@@ -110,8 +115,9 @@ class Folder_Handler:
     def set_album(self, album):
         for file in self.Folder:
             self.Folder_Dict[file]['temp_album']=album
-
-    # Sorting Functions
+    """
+    Sorting Functions
+    """
     def sort_name(self, r=False):
         # Sort by file name
         self.Folder.sort(key=self._temp_name, reverse=r)
@@ -140,8 +146,11 @@ class Folder_Handler:
         self.Folder.sort(key=tag.get_title, reverse=r)
 
 
-
+    """
+    Additional Functions
+    """
     def auto_number(self):
+        # Auto numbers the files based on the current sorting
         for i, file in enumerate(self.Folder):
             self.Folder_Dict[file]['temp_num']=i+1
 
@@ -151,12 +160,15 @@ class Folder_Handler:
             self.Folder_Dict[file]['temp_num']='None'
 
     def file_name_to_title(self):
+        # Copies file name as ID3 title field
         for file in self.Folder:
             self.Folder_Dict[file]['temp_title']=self.Folder_Dict[file]['temp_name']
 
-
-    # Naming Functions
+    """
+    Naming Functions
+    """
     def remove_from_name(self, remove):
+        # Removes the specified phrase "remove" from the name
         for file in self.Folder:
             self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['temp_name'].replace(remove, '')
 
@@ -167,28 +179,37 @@ class Folder_Handler:
             new_name = " ".join(name.split(' '))
             self.Folder_Dict[file]['temp_name'] = new_name
 
-    def strip_left(self):
+    def strip_left(self, amount=1):
+        # Strips characters from the left side of the name
+        #   Strips 1 character by default
         for file in self.Folder:
-            self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['temp_name'][1:]
+            self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['temp_name'][amount:]
 
-    def strip_right(self):
+    def strip_right(self, ammount=1):
+        # Strips characters from the right side of the name
+        #   Strips 1 character by default
             for file in self.Folder:
-                self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['temp_name'][:-1]
+                self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['temp_name'][:((-1)*ammount)]
 
     def revert(self):
+        # Puts back the original data into the temporary data
         for file in self.Folder:
             self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['name']
             self.Folder_Dict[file]['temp_num']=self.Folder_Dict[file]['num']
             self.Folder_Dict[file]['temp_title']=self.Folder_Dict[file]['title']
             self.Folder_Dict[file]['temp_album']=self.Folder_Dict[file]['album']
 
+    """
+    Saving Functions
+    """
     def save_info(self):
-        # Saves info, does nothing None
+        # Saves info
         for file in self.Folder:
             path = self.Folder_Dict[file]['path']
             tag.save_number(path, self.Folder_Dict[file]['temp_num'])
             tag.save_title(path, self.Folder_Dict[file]['temp_title'])
             self.save_name(file)
+            # Need save album
 
     def save_name(self, file):
         # Save file name

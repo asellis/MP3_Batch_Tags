@@ -1,3 +1,8 @@
+"""
+Contains the code for using the GUI
+Stores all files in Folder_Handler class
+"""
+
 from tkinter import *
 from tkinter import filedialog      # For opening a folder
 from tkinter.ttk import Treeview    # For listing the contents of a folder
@@ -13,6 +18,9 @@ class MP3_Tags_GUI:
         master.columnconfigure(4, weight=1)
         #master.geometry("800x500")
 
+        """
+        GUI Widgets
+        """
         # Folder Path
         self.Folder_Label = Label(master, text="Folder", width = 15, padx = 2, pady = 2)
         self.Folder_Label.grid(row=1, column=1, padx = 2, pady = 2)
@@ -32,7 +40,7 @@ class MP3_Tags_GUI:
         # Scrollbar for folder contents
         self.Folder_List_Span = 200
 
-        
+        # Old, now use treeview instead of listbox
         #self.Folder_List = Listbox(master, yscrollcommand=self.scrollbar.set, height = 30, width = 80)
         #self.Folder_List.grid(row=2, column=4, rowspan=self.Folder_List_Span, sticky=N+S+E+W,
         #                      padx = 2, pady = 2)
@@ -98,11 +106,13 @@ class MP3_Tags_GUI:
                               .grid(row=start_row+3, column=2, sticky=W)
 
         """
+        # Had issues getting song length, may implement later
         self.song_length = IntVar()
         self.song_length_check = Checkbutton(master, text="Song Length", variable=self.song_length,
                             onvalue=1, offvalue=0, command=self.Toggle_Length)\
                             .grid(row=start_row+2, column=3, sticky=W)
         """
+        
         self.album_tog = IntVar()
         self.album_check = Checkbutton(master, text="Album", variable=self.album_tog,
                             onvalue=1, offvalue=0, command=self.Toggle_Album)\
@@ -114,7 +124,7 @@ class MP3_Tags_GUI:
 
         
         """
-        # Radio button for sorting
+        # OLD Radio button for sorting
         self.start_row = 3
         self.Sort_Setting = IntVar()
         
@@ -181,7 +191,10 @@ class MP3_Tags_GUI:
                        .grid(row=start_row+1, column=2, padx=2, pady=2)
         Button(master, text="Right", width = 15, padx = 2, pady = 2, command=self.Strip_Right)\
                        .grid(row=start_row+1, column=3, padx=2, pady=2)
-        
+
+    """
+    Setup Functions
+    """
     def Open_Folder(self):
         # Opens folder stored in Folder_Entry
         print("Opening Folder")
@@ -218,6 +231,8 @@ class MP3_Tags_GUI:
         self.Folder_Entry.config(state='disabled')
 
     def Update_List(self):
+        # OLD, used to update list
+        # replaced by Update_Tree
         self.Folder_List.delete(0,"end")
 
         # Set Toggles
@@ -239,9 +254,9 @@ class MP3_Tags_GUI:
                 values=(item['temp_num'], item['modify_date'], item['creation_date'],\
                         item['temp_album'], item['temp_title'], item['length']))
 
-
-    # Toggles for viewing file info
-    
+    """
+    Toggles for viewing file info
+    """ 
     def Toggle_Num(self):
         # Shows numbers in list of files
         if self.file_num and 'Number' not in self.viewable_items:
@@ -290,7 +305,6 @@ class MP3_Tags_GUI:
             self.viewable_items.remove('Length')
         self.tree['displaycolumns']=self.viewable_items
         
-
     """
     Sorts
     """
@@ -358,8 +372,6 @@ class MP3_Tags_GUI:
     def Sort_Length(self):
         pass
 
-        
-
     def _Sort_Reverse_False(self, name):
         for item in self.items:
             if item != name:
@@ -372,7 +384,10 @@ class MP3_Tags_GUI:
         else:
             self.Sort_Reverse[name] = False
             return True
-        
+
+    """
+    Additional tag functions
+    """
     def Auto_Number(self):
         # Auto Numbers based on sort, does not save
         self.Folder.auto_number()
@@ -399,7 +414,14 @@ class MP3_Tags_GUI:
         self.Folder.set_album(album)
         self.Update_Tree()
 
-    # Naming Functions
+    def Save_Info(self):
+        print('Saving Info')
+        self.Folder.save_info()
+        print('Done')
+
+    """
+    Naming Functions
+    """
     def Remove_from_Name(self):
         remove = self.Remove_Text_Entry.get()
         self.Folder.remove_from_name(remove)
@@ -419,20 +441,16 @@ class MP3_Tags_GUI:
         self.Folder.strip_right()
         self.Update_Tree()
 
-
-    def Save_Info(self):
-        print('Saving Info')
-        self.Folder.save_info()
-        print('Done')
-        
-
-    # GUI Functions
-
+    """
+    GUI Functions
+    """
     def Blank_Row(self, row, col=1, height=2, col_span=1):
+        # Inserts a blank row
         Label(self.master, text="").grid(row=row, column=col, columnspan=col_span, pady=height)
 
 
 if __name__ == "__main__":
+    # Starts the program
     test = Tk()
     gui =  MP3_Tags_GUI(test)
     test.mainloop()

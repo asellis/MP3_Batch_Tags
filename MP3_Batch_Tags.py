@@ -1,3 +1,5 @@
+# Used to easily start the program
+
 import sys
 sys.path.append("src")
 

@@ -8,6 +8,26 @@ from mutagen.id3 import ID3, ID3NoHeaderError
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 
+def safe_path(path):
+    folder=path.split('\\')
+    new_folder_name = ''
+    for part in folder[0:-1]:
+        new_folder_name += part
+        new_folder_name += '/'
+    new_folder_name+=folder[-1]
+    return new_folder_name
+
+def make_EasyID3(path):
+    # If path has ID3 then will return EasyID3 object
+    # If not then it will add ID3 and return
+    file = safe_path(str(path))
+    try:
+        obj = EasyID3(file)
+    except ID3NoHeaderError:
+        obj = MP3(file, ID3=EasyID3)
+        obj.add_tags(ID3=EasyID3)
+    return obj
+
 def track_num(path):
     file = make_EasyID3(path)
     num = file.get('tracknumber')
@@ -31,26 +51,10 @@ def sort_num(folder):
     folder.sort(key=track_num)
     return folder
 
-def safe_path(path):
-    folder=path.split('\\')
-    new_folder_name = ''
-    for part in folder[0:-1]:
-        new_folder_name += part
-        new_folder_name += '/'
-    new_folder_name+=folder[-1]
-    return new_folder_name
 
-def make_EasyID3(path):
-    # If path has ID3 then will return EasyID3 object
-    # If not then it will add ID3 and return
-    file = safe_path(str(path))
-    try:
-        obj = EasyID3(file)
-    except ID3NoHeaderError:
-        obj = MP3(file, ID3=EasyID3)
-        obj.add_tags(ID3=EasyID3)
-    return obj
-
+"""
+Get info from file
+"""
 def get_creation_date(file):
     return file.stat().st_ctime
 
@@ -88,8 +92,9 @@ def get_length(path):
         return length
     return length[0]
 
-
-# Saving Functions
+"""
+Saving Functions
+"""
 def save_number(path, number):
     file = make_EasyID3(path)
     file['tracknumber'] = str(number)
@@ -108,7 +113,7 @@ def save_name(path, name):
     # Saves the file name
     path.rename(new_name)
 
-
+# def save_album(path, album):
 
 #from mutagen.easyid3 import EasyID3
 #print(EasyID3.valid_keys.keys())
