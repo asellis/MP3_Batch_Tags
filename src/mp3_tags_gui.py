@@ -229,6 +229,7 @@ class MP3_Tags_GUI:
         self.Folder_Entry.delete(0,END)
         self.Folder_Entry.insert(0,self.Folder_Path)
         self.Folder_Entry.config(state='disabled')
+        self.Open_Folder()
 
     def Update_List(self):
         # OLD, used to update list
