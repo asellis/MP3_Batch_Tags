@@ -208,6 +208,7 @@ class Folder_Handler:
             path = self.Folder_Dict[file]['path']
             tag.save_number(path, self.Folder_Dict[file]['temp_num'])
             tag.save_title(path, self.Folder_Dict[file]['temp_title'])
+            tag.save_album(path, self.Folder_Dict[file]['temp_album'])
             self.save_name(file)
             # Need save album
 

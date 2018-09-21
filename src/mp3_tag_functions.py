@@ -109,6 +109,11 @@ def save_title(path, title):
         file['title']=''
     file.save()
 
+def save_album(path, album):
+    file = make_EasyID3(path)
+    file['album'] = str(album)
+    file.save()
+
 def save_name(path, name):
     # Saves the file name
     path.rename(new_name)
