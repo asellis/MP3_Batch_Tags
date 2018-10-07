@@ -36,6 +36,7 @@ class Folder_Handler:
                 ('temp_name',file.stem),
                 ('num', str(tag.track_num(file))),
                 ('temp_num', str(tag.track_num(file))),
+                ('file_name_num', self.file_name_num(file.stem)),
                 ('modify_date', str(time.ctime(tag.get_mod_date(file)))),
                 ('creation_date', str(time.ctime(tag.get_creation_date(file)))),
                 ('album', str(tag.get_album(file))),
@@ -97,6 +98,21 @@ class Folder_Handler:
             info.append(self.Folder_Dict[item])
         return info
 
+    def file_name_num(self, file_name):
+        # returns a list with the numbers found in the file name
+        new_name = file_name.replace('-', ' ')
+        new_name = new_name.replace('_', ' ')
+        name_list = new_name.split(' ')
+        num_list = []
+        for item in name_list:
+            # will try to convert to int, then append to num_list
+            try:
+                number = int(item)
+                num_list.append(number)
+            except:
+                pass
+        return num_list
+
     def toggle_file_numbers(self, toggle):
         # Toggles wether or not the file number will be displayed
         self.file_numbers = toggle
@@ -145,6 +161,12 @@ class Folder_Handler:
         # Sort by track name
         self.Folder.sort(key=tag.get_title, reverse=r)
 
+    def sort_file_name_num(self, r=False):
+        # Sort by the file name nubmers
+        self.Folder.sort(key=self.get_file_name_num, reverse=r)
+
+    def get_file_name_num(self, file):
+        return self.Folder_Dict[file]['file_name_num']
 
     """
     Additional Functions
@@ -191,13 +213,10 @@ class Folder_Handler:
             for file in self.Folder:
                 self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['temp_name'][:((-1)*ammount)]
 
-    def revert(self):
-        # Puts back the original data into the temporary data
+    def strip_filler(self):
+        # Strips filler characters from ends
         for file in self.Folder:
-            self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['name']
-            self.Folder_Dict[file]['temp_num']=self.Folder_Dict[file]['num']
-            self.Folder_Dict[file]['temp_title']=self.Folder_Dict[file]['title']
-            self.Folder_Dict[file]['temp_album']=self.Folder_Dict[file]['album']
+            self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['temp_name'].strip(' -_')
 
     """
     Saving Functions
@@ -224,3 +243,11 @@ class Folder_Handler:
             print('Invalid name,"{}", for "{}"'.format(\
                 self.Folder_Dict[file]['temp_name'],
                 self.Folder_Dict[file]['path']))
+
+    def revert(self):
+        # Puts back the original data into the temporary data
+        for file in self.Folder:
+            self.Folder_Dict[file]['temp_name']=self.Folder_Dict[file]['name']
+            self.Folder_Dict[file]['temp_num']=self.Folder_Dict[file]['num']
+            self.Folder_Dict[file]['temp_title']=self.Folder_Dict[file]['title']
+            self.Folder_Dict[file]['temp_album']=self.Folder_Dict[file]['album']

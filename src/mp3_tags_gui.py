@@ -46,9 +46,9 @@ class MP3_Tags_GUI:
         #                      padx = 2, pady = 2)
 
         # Set view of files as Treeview
-        self.items = ['Name', 'Number', 'Modified', 'Created', 'Album', 'Title']
+        self.items = ['Name', 'Number', 'Modified', 'Created', 'Album', 'Title', 'File Name #']
         self.sortables = [self.Sort_Name, self.Sort_Number, self.Sort_Modified, self.Sort_Created,\
-                          self.Sort_Album, self.Sort_Title]
+                          self.Sort_Album, self.Sort_Title, self.Sort_File_Name_Num]
         self.Sort_Reverse = dict()
         for item in self.items:
             self.Sort_Reverse[item] = False # Will turn true after sorting once
@@ -122,6 +122,11 @@ class MP3_Tags_GUI:
                             onvalue=1, offvalue=0, command=self.Toggle_Title)\
                             .grid(row=start_row+2, column=2, sticky=W)
 
+        self.file_name_num_tog = IntVar()
+        self.file_name_num_check = Checkbutton(master, text="File Name #", variable=self.file_name_num_tog,
+                            onvalue=1, offvalue=0, command=self.Toggle_File_Name_Num)\
+                            .grid(row=start_row+4, column=1, sticky=W)
+
         
         """
         # OLD Radio button for sorting
@@ -192,6 +197,15 @@ class MP3_Tags_GUI:
         Button(master, text="Right", width = 15, padx = 2, pady = 2, command=self.Strip_Right)\
                        .grid(row=start_row+1, column=3, padx=2, pady=2)
 
+        # Strip Filler
+        start_row = start_row + 2
+        Button(master, text="Strip Filler", width = 15, padx = 2, pady = 2, command=self.Strip_Filler)\
+                      .grid(row=start_row, column = 1, padx = 2, pady = 2)
+
+        # Fix Whitespace
+        Button(master, text="Fix Whitespace", width = 15, padx = 2, pady = 2, command=self.Fix_Whitespace)\
+                      .grid(row=start_row, column = 2, padx = 2, pady = 2)
+
     """
     Setup Functions
     """
@@ -253,7 +267,7 @@ class MP3_Tags_GUI:
         for item in info:
             self.tree.insert('', 'end', text=item['temp_name'],
                 values=(item['temp_num'], item['modify_date'], item['creation_date'],\
-                        item['temp_album'], item['temp_title'], item['length']))
+                        item['temp_album'], item['temp_title'], item['file_name_num']))
 
     """
     Toggles for viewing file info
@@ -304,6 +318,14 @@ class MP3_Tags_GUI:
             self.viewable_items.append('Length')
         else:
             self.viewable_items.remove('Length')
+        self.tree['displaycolumns']=self.viewable_items
+
+    def Toggle_File_Name_Num(self):
+        # Shows the numbers in the file name from the begining of the file name
+        if 'File Name #' not in self.viewable_items:
+            self.viewable_items.append('File Name #')
+        else:
+            self.viewable_items.remove('File Name #')
         self.tree['displaycolumns']=self.viewable_items
         
     """
@@ -386,6 +408,13 @@ class MP3_Tags_GUI:
             self.Sort_Reverse[name] = False
             return True
 
+    def Sort_File_Name_Num(self):
+        # Sorts based on number in name from the start of the file name
+        self._Sort_Reverse_False('File Name #')
+        r = self._Sort_Toggle('File Name #')
+        self.Folder.sort_file_name_num(r)
+        self.Update_Tree()
+
     """
     Additional tag functions
     """
@@ -440,6 +469,11 @@ class MP3_Tags_GUI:
     def Strip_Right(self):
         # Strips a single character from the right side of the name
         self.Folder.strip_right()
+        self.Update_Tree()
+
+    def Strip_Filler(self):
+        # Strips any filler characters from the ends
+        self.Folder.strip_filler()
         self.Update_Tree()
 
     """
